@@ -80,7 +80,7 @@ exports.Login = async (req, res) => {
         });
 
         res.status(200).send({
-            id: user.id,
+            userId: user.userId,
             username: user.userName,
             message: 'Login successful'
         });
