@@ -28,6 +28,8 @@ exports.Signup = async (req, res) => {
             userName,
             email,
             password: hashedPassword,
+            location,
+            userType
         });
         const token = jwt.sign({ userId: newUser.userId, userName: newUser.userName }, process.env.JWT_SECRET, {
             expiresIn: 86400 
