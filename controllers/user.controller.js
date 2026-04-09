@@ -68,7 +68,8 @@ exports.Login = async (req, res) => {
             return res.status(401).send({ accessToken: null, message: "Invalid Password!" });
         }
 
-        const token = jwt.sign({ userId: user.userId, userName: user.userName }, process.env.JWT_SECRET, {
+        const token = jwt.sign({ userId: user.userId, userName: user.userName }, 
+            process.env.JWT_SECRET, {
             expiresIn: 86400 //24hrs
         });
 
@@ -82,11 +83,15 @@ exports.Login = async (req, res) => {
         res.status(200).send({
             userId: user.userId,
             username: user.userName,
-            message: 'Login successful'
+            email: user.email,
+            userType: user.userType,
+            Location: user.location,
+            accessToken: token,
+            
         });
     } catch (err) {
         res.status(500).send({
-            message: err.message || "Some error occurred while logging in."
+            message: err.message || "Internal server error occurred while logging in."
         });
     }
 };
