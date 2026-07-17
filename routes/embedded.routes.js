@@ -1,14 +1,3 @@
-// const sensorController = require('../controllers/embedded.controller');
-// const express = require('express');
-// const router = express.Router();
-
-// router.post('/api/sensor-data', sensorController.ReceiveSensorData);
-// router.get('/api/sensor-data', sensorController.GetSensorData);
-// router.get('/api/sensor-data/latest', sensorController.GetLatestSensorData);
-
-// module.exports = router;
-
-
 const { Router } = require("express");
 
 module.exports = app => {
