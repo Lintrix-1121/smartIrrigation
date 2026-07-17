@@ -24,6 +24,7 @@ require("./routes/irrigationMethods.route.js")(app);
 require("./routes/location.route.js")(app);
 require("./routes/schedule.route.js")(app);
 require("./routes/embedded.routes.js")(app);
+require("./routes/deviceConfig.routes.js")(app);
 
 app.listen(1900, () => {
     console.log("Fuel server on set");
