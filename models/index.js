@@ -26,6 +26,7 @@ db.soil = require("./soil.js")(sequelize_config, Sequelize);
 db.location = require("./locations.js")(sequelize_config,Sequelize);
 db.schedule = require("./schedule.js")(sequelize_config, Sequelize);
  db.embedded = require("./embedded.js")(sequelize_config, Sequelize);
+ db.deviceConfig = require("./deviceConfig.js")(sequelize_config, Sequelize);
 
 
 module.exports =db;
