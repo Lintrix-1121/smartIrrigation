@@ -1,5 +1,11 @@
+const { Sequelize } = require(".");
+
 module.exports = (sequelize, DataTypes) => {
     const SensorReading = sequelize.define('SensorReading', {
+        plot: {
+            type: DataTypes.ENUM('A', 'B', 'C'),
+            allowNull: false
+        },
         timestamp: {
             type: DataTypes.DATE,
             allowNull: false

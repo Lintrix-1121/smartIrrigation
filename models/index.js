@@ -27,6 +27,8 @@ db.location = require("./locations.js")(sequelize_config,Sequelize);
 db.schedule = require("./schedule.js")(sequelize_config, Sequelize);
  db.embedded = require("./embedded.js")(sequelize_config, Sequelize);
  db.deviceConfig = require("./deviceConfig.js")(sequelize_config, Sequelize);
+ db.plotConfig = require("./plotConfig.js")(sequelize_config, Sequelize);
+ db.alert = require("./alert.js")(sequelize_config, Sequelize);
 
 
 module.exports =db;
