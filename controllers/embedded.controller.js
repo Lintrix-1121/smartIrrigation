@@ -1,5 +1,5 @@
 const db = require("../models");
-const SensorReading = db.SensorReading;
+const SensorReading = db.embedded;
 const { Op } = require("sequelize");
 const axios = require("axios");
 
