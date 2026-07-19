@@ -50,38 +50,20 @@ const fetchWeather = async (lat, lon) => {
   }
 };
 
-// RECEIVE SENSOR DATA (supports multiple plots)
 exports.ReceiveSensorData = async (req, res) => {
   try {
-    const {
-      plots,          // array of plot objects
-      timestamp,
-      latitude,
-      longitude,
-      // optional: if single-plot fallback needed, we could also accept individual fields
-    } = req.body;
+    const { plots, timestamp, latitude, longitude } = req.body;
 
-    // Validate presence of required top-level fields
     if (!timestamp || latitude === undefined || longitude === undefined) {
-      return res.status(400).send({
-        status: "error",
-        message: "Missing timestamp, latitude, or longitude"
-      });
+      return res.status(400).send({ status: "error", message: "Missing timestamp, latitude, or longitude" });
     }
-
-    // Validate plots array
     if (!plots || !Array.isArray(plots) || plots.length === 0) {
-      return res.status(400).send({
-        status: "error",
-        message: "Missing 'plots' array with sensor readings"
-      });
+      return res.status(400).send({ status: "error", message: "Missing 'plots' array" });
     }
 
-    // Fetch weather once for the farm location
     const weatherData = await fetchWeather(latitude, longitude);
-
-    // Prepare records for bulk insertion
     const records = [];
+
     for (const p of plots) {
       // Validate each plot object
       if (
@@ -96,12 +78,10 @@ exports.ReceiveSensorData = async (req, res) => {
         p.irrigation_on === undefined ||
         p.fertilizer_on === undefined
       ) {
-        // Skip invalid plot or throw error – we'll skip to avoid partial failure
-        console.warn(`Skipping invalid plot data:`, p);
+        console.warn("Skipping invalid plot data:", p);
         continue;
       }
 
-      // Compute low flags using the global thresholds (or you could use per-plot thresholds if passed)
       const moistureLow = isMoistureLow(p.moisture);
       const nutrientLow = isNutrientLow(p.nitrogen, p.phosphorus, p.potassium);
 
@@ -129,34 +109,125 @@ exports.ReceiveSensorData = async (req, res) => {
     }
 
     if (records.length === 0) {
-      return res.status(400).send({
-        status: "error",
-        message: "No valid plot records to save"
-      });
+      return res.status(400).send({ status: "error", message: "No valid plot records" });
     }
 
-    // Bulk create all records
-    const saved = await SensorReading.bulkCreate(records);
-
-    return res.send({
-      status: "success",
-      message: `Sensor data saved for ${saved.length} plot(s)`,
-      result: {
-        count: saved.length,
-        weather: weatherData,
-        // Optionally return the first few records
-        // saved: saved.slice(0, 5)
-      }
-    });
+    await SensorReading.bulkCreate(records);
+    res.send({ status: "success", message: `Saved ${records.length} plot(s)` });
 
   } catch (err) {
     console.error(err);
-    return res.status(500).send({
-      status: "error",
-      message: err.message
-    });
+    res.status(500).send({ status: "error", message: err.message });
   }
 };
+
+// RECEIVE SENSOR DATA (supports multiple plots)
+// exports.ReceiveSensorData = async (req, res) => {
+//   try {
+//     const {
+//       plots,          // array of plot objects
+//       timestamp,
+//       latitude,
+//       longitude,
+//       // optional: if single-plot fallback needed, we could also accept individual fields
+//     } = req.body;
+
+//     // Validate presence of required top-level fields
+//     if (!timestamp || latitude === undefined || longitude === undefined) {
+//       return res.status(400).send({
+//         status: "error",
+//         message: "Missing timestamp, latitude, or longitude"
+//       });
+//     }
+
+//     // Validate plots array
+//     if (!plots || !Array.isArray(plots) || plots.length === 0) {
+//       return res.status(400).send({
+//         status: "error",
+//         message: "Missing 'plots' array with sensor readings"
+//       });
+//     }
+
+//     // Fetch weather once for the farm location
+//     const weatherData = await fetchWeather(latitude, longitude);
+
+//     // Prepare records for bulk insertion
+//     const records = [];
+//     for (const p of plots) {
+//       // Validate each plot object
+//       if (
+//         !p.plot ||
+//         p.moisture === undefined ||
+//         p.temperature === undefined ||
+//         p.conductivity === undefined ||
+//         p.pH === undefined ||
+//         p.nitrogen === undefined ||
+//         p.phosphorus === undefined ||
+//         p.potassium === undefined ||
+//         p.irrigation_on === undefined ||
+//         p.fertilizer_on === undefined
+//       ) {
+//         // Skip invalid plot or throw error – we'll skip to avoid partial failure
+//         console.warn(`Skipping invalid plot data:`, p);
+//         continue;
+//       }
+
+//       // Compute low flags using the global thresholds (or you could use per-plot thresholds if passed)
+//       const moistureLow = isMoistureLow(p.moisture);
+//       const nutrientLow = isNutrientLow(p.nitrogen, p.phosphorus, p.potassium);
+
+//       records.push({
+//         plot: p.plot,
+//         timestamp: new Date(timestamp),
+//         latitude,
+//         longitude,
+//         moisture: p.moisture,
+//         temperature: p.temperature,
+//         conductivity: p.conductivity,
+//         pH: p.pH,
+//         nitrogen: p.nitrogen,
+//         phosphorus: p.phosphorus,
+//         potassium: p.potassium,
+//         irrigationOn: p.irrigation_on === 1,
+//         fertilizerOn: p.fertilizer_on === 1,
+//         weather: weatherData.weather,
+//         airTemperature: weatherData.airTemperature,
+//         humidity: weatherData.humidity,
+//         rainfall: weatherData.rainfall,
+//         moistureLow,
+//         nutrientLow
+//       });
+//     }
+
+//     if (records.length === 0) {
+//       return res.status(400).send({
+//         status: "error",
+//         message: "No valid plot records to save"
+//       });
+//     }
+
+//     // Bulk create all records
+//     const saved = await SensorReading.bulkCreate(records);
+
+//     return res.send({
+//       status: "success",
+//       message: `Sensor data saved for ${saved.length} plot(s)`,
+//       result: {
+//         count: saved.length,
+//         weather: weatherData,
+//         // Optionally return the first few records
+//         // saved: saved.slice(0, 5)
+//       }
+//     });
+
+//   } catch (err) {
+//     console.error(err);
+//     return res.status(500).send({
+//       status: "error",
+//       message: err.message
+//     });
+//   }
+// };
 
 // GET ALL (with optional plot filter)
 exports.GetSensorData = async (req, res) => {
