@@ -21,7 +21,7 @@ db.sequelize_config = sequelize_config;
 
 db.users = require("./users.js")(sequelize_config, Sequelize);
 db.crops = require("./crops.js")(sequelize_config, Sequelize);
-db.irrigbMtd = require("./irrigationMethods.js")(sequelize_config, Sequelize);
+db.irrignMtd = require("./irrigationMethods.js")(sequelize_config, Sequelize);
 db.soil = require("./soil.js")(sequelize_config, Sequelize);
 db.location = require("./locations.js")(sequelize_config,Sequelize);
 db.schedule = require("./schedule.js")(sequelize_config, Sequelize);

@@ -1,6 +1,6 @@
 
 const db = require("../models");
-const Method = db.method;
+const Method = db.irrignMtd;
 const { Op } = require("sequelize");
 
 exports.MethodData = (req, res) => {
