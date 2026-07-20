@@ -82,10 +82,10 @@ exports.Login = async (req, res) => {
 
         res.status(200).send({
             userId: user.userId,
-            username: user.userName,
+            userName: user.userName,
             email: user.email,
             userType: user.userType,
-            Location: user.location,
+            location: user.location,
             accessToken: token,
             
         });
